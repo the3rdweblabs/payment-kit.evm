@@ -1,0 +1,88 @@
+[profile.default]
+src = "src"
+out = "out"
+libs = ["lib"]
+optimizer = true
+optimizer_runs = 200
+solc_version = "0.8.36"
+
+# Deploy scripts write their artifacts here (see script/DeployOutput.s.sol).
+fs_permissions = [{ access = "read-write", path = "./deployments" }]
+
+# Same settings as default, compiled through the EVM assembly pipeline (IR).
+# Used in CI to prove the contracts behave identically when deployed via
+# compilers that force IR generation (e.g. some verifiers/upgrader tooling).
+# Invariant campaign is shrunk to keep CI time reasonable.
+[profile.via_ir]
+src = "src"
+out = "out_via_ir"
+libs = ["lib"]
+optimizer = true
+optimizer_runs = 200
+solc_version = "0.8.36"
+via_ir = true
+
+[profile.via_ir.invariant]
+runs = 16
+depth = 15
+
+# RPC endpoints - one per network. Every value reads an env var; the public
+# fallback defaults for those vars live in the Makefile (`?=` block right
+# below the `-include .env`), so all make targets work with an empty .env.
+# Override in .env with your own provider (Alchemy/QuickNode/etc) for higher
+# rate limits. Order matches the Makefile.
+[rpc_endpoints]
+ethereum_mainnet = "${ETH_MAINNET_RPC_URL}"
+ethereum_testnet = "${ETH_SEPOLIA_RPC_URL}" # Sepolia
+bnb_mainnet = "${BNB_MAINNET_RPC_URL}"
+bnb_testnet = "${BNB_TESTNET_RPC_URL}"
+arbitrum_mainnet = "${ARBITRUM_MAINNET_RPC_URL}" # Arbitrum One
+arbitrum_testnet = "${ARBITRUM_SEPOLIA_RPC_URL}" # Arbitrum Sepolia
+base_mainnet = "${BASE_MAINNET_RPC_URL}"
+base_testnet = "${BASE_TESTNET_RPC_URL}" # Base Sepolia
+op_mainnet = "${OP_MAINNET_RPC_URL}"
+op_testnet = "${OP_TESTNET_RPC_URL}" # OP Sepolia
+monad_mainnet = "${MONAD_MAINNET_RPC_URL}"
+monad_testnet = "${MONAD_TESTNET_RPC_URL}" # primary test target
+hyperliquid_mainnet = "${HYPERLIQUID_MAINNET_RPC_URL}" # HyperEVM
+hyperliquid_testnet = "${HYPERLIQUID_TESTNET_RPC_URL}"
+robinhood_mainnet = "${ROBINHOOD_MAINNET_RPC_URL}" # Orbit L2, ETH gas
+robinhood_testnet = "${ROBINHOOD_TESTNET_RPC_URL}"
+xlayer_mainnet = "${XLAYER_MAINNET_RPC_URL}"
+xlayer_testnet = "${XLAYER_TESTNET_RPC_URL}"
+botchain_mainnet = "${BOTCHAIN_MAINNET_RPC_URL}" # BOT, chainId 677
+botchain_testnet = "${BOTCHAIN_TESTNET_RPC_URL}" # tBOT, chainId 968
+
+# Verification. Etherscan v2 = one key covers ethereum / bnb / arbitrum / base /
+# optimism including their testnets - see https://docs.etherscan.io/etherscan-v2.
+# The remaining explorers use their own APIs; uncomment once you hold keys.
+[etherscan]
+ethereum_mainnet = { key = "${ETHERSCAN_API_KEY}", chain = 1 }
+ethereum_testnet = { key = "${ETHERSCAN_API_KEY}", chain = 11155111 }
+bnb_mainnet = { key = "${ETHERSCAN_API_KEY}", chain = 56 }
+bnb_testnet = { key = "${ETHERSCAN_API_KEY}", chain = 97 }
+arbitrum_mainnet = { key = "${ETHERSCAN_API_KEY}", chain = 42161 }
+arbitrum_testnet = { key = "${ETHERSCAN_API_KEY}", chain = 421614 }
+base_mainnet = { key = "${ETHERSCAN_API_KEY}", chain = 8453 }
+base_testnet = { key = "${ETHERSCAN_API_KEY}", chain = 84532 }
+op_mainnet = { key = "${ETHERSCAN_API_KEY}", chain = 10 }
+op_testnet = { key = "${ETHERSCAN_API_KEY}", chain = 11155420 }
+monad_testnet = { key = "${MONADSCAN_API_KEY}", chain = 10143, url = "https://api-testnet.monadscan.com/api" }
+monad_mainnet = { key = "${MONADSCAN_API_KEY}", chain = 143, url = "https://api.monadscan.com/api" }
+# hyperliquid_mainnet = { key = "${HYPERSCOUT_API_KEY}", chain = 999, url = "https://hyperevmscan.io/api" }
+# hyperliquid_testnet = { key = "${PURRSEC_API_KEY}", chain = 998, url = "https://purrsec.com/api" }
+# robinhood_mainnet = { key = "${ROBINHOOD_API_KEY}", chain = 4663, url = "https://robinscan.io/api" } # Blockscout
+# robinhood_testnet = { key = "${ROBINHOOD_API_KEY}", chain = 46630, url = "https://explorer.testnet.chain.robinhood.com/api" }
+# xlayer_mainnet = { key = "${OKLINK_API_KEY}", chain = 196, url = "https://www.oklink.com/api/v5/explorer/contract/verify-source-code-plugin/X_LAYER" }
+# xlayer_testnet = { key = "${OKLINK_API_KEY}", chain = 195, url = "https://www.oklink.com/api/v5/explorer/contract/verify-source-code-plugin/XLAYER_TESTNET" }
+# botchain_mainnet = { key = "${BOTCHAIN_API_KEY}", chain = 677, url = "https://scan.botchain.ai/api" }
+# botchain_testnet = { key = "${BOTCHAIN_API_KEY}", chain = 968, url = "https://scan.bohr.life/api" }
+
+# block-timestamp is intentionally excluded: PaymentRegistry's receipt expiry
+# compares against block.timestamp by design - expiry windows are minute/day
+# granularity, so validator timestamp jitter (±a few seconds) can't affect
+# correctness.
+[lint]
+exclude_lints = ["block-timestamp"]
+
+# See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options

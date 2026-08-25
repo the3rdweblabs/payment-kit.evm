@@ -1,0 +1,13 @@
+cache/
+out/
+broadcast/
+deployments/localnet.json
+.env
+.vscode/
+.idea/
+
+# forge snapshot output
+.gas-snapshot
+
+# via_ir profile build output
+out_via_ir/
