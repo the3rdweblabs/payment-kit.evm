@@ -43,7 +43,7 @@ jobs:
         uses: foundry-rs/foundry-toolchain@v1
 
       - name: Cache compiler builds
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: |
             cache
@@ -70,7 +70,7 @@ jobs:
         uses: foundry-rs/foundry-toolchain@v1
 
       - name: Cache compiler builds
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: |
             cache
