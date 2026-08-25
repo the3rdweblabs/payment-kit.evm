@@ -1,0 +1,107 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  FOUNDRY_DISABLE_NIGHTLY_WARNING: "1"
+
+jobs:
+  lint:
+    name: forge fmt --check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+
+      - name: Check formatting
+        run: forge fmt --check
+
+  build:
+    name: build (0.8.36)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+
+      - name: Cache compiler builds
+        uses: actions/cache@v4
+        with:
+          path: |
+            cache
+            out
+            ~/.svm
+          key: foundry-${{ runner.os }}-${{ github.ref_name }}-${{ github.sha }}
+          restore-keys: |
+            foundry-${{ runner.os }}-${{ github.ref_name }}-
+            foundry-${{ runner.os }}-default-
+
+      - name: Build
+        run: forge build
+
+  test:
+    name: test
+    needs: [lint, build]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+
+      - name: Cache compiler builds
+        uses: actions/cache@v4
+        with:
+          path: |
+            cache
+            out
+            ~/.svm
+          key: foundry-${{ runner.os }}-${{ github.sha }}
+          restore-keys: |
+            foundry-${{ runner.os }}-${{ github.sha }}
+            foundry-${{ runner.os }}-${{ github.ref_name }}-
+
+      - name: Run tests
+        run: forge test -vvv
+
+  via-ir:
+    name: test (via_ir profile)
+    needs: [lint, build]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+
+      - name: Build through IR pipeline
+        run: forge build
+        env:
+          FOUNDRY_PROFILE: via_ir
+
+      - name: Run tests (reduced invariant campaign)
+        run: forge test -vv
+        env:
+          FOUNDRY_PROFILE: via_ir

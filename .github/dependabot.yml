@@ -1,0 +1,27 @@
+version: 2
+updates:
+  # CI workflow actions (checkout, foundry-toolchain, cache, release-please)
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
+      - "ci"
+
+  # Vendored dependencies (forge-std + OpenZeppelin) - keep the pins fresh.
+  # Bumping a submodule is just a commit; CI validates the whole matrix.
+  - package-ecosystem: "gitsubmodule"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
+      - "solidity"
+    ignore:
+      # OpenZeppelin major/minor bumps can change storage layouts of
+      # inherited upgradeable contracts and are never routine updates.
+      - dependency-name: "openzeppelin-contracts"
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]
+      - dependency-name: "openzeppelin-contracts-upgradeable"
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]

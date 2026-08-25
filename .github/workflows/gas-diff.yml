@@ -1,0 +1,96 @@
+name: Gas diff
+
+# Compares gas usage of the PR head against the base branch (make/forge snapshot)
+# and comments the delta on the PR. Replaces its own comment on each push so
+# there is exactly one report per PR.
+on:
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  gas-diff:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout head
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+
+      - name: Snapshot (head)
+        run: forge snapshot --snap /tmp/gas-head.txt
+
+      - name: Checkout base branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.base_ref }}
+          submodules: recursive
+          path: base
+
+      - name: Snapshot (base)
+        run: cd base && forge snapshot --snap /tmp/gas-base.txt
+
+      - name: Build diff comment
+        id: diff
+        run: |
+          {
+            echo "report<<EOF"
+            echo "## ⛽ Gas diff vs \`${{ github.base_ref }}\`"
+            echo ""
+            if diff -u /tmp/gas-base.txt /tmp/gas-head.txt > /tmp/gas.diff; then
+              echo "**No gas changes detected.**"
+            else
+              changed=$(grep -E "^[+-][^+-]" /tmp/gas.diff | grep -c "gas:" || true)
+              echo "$changed test(s) changed gas:"
+              echo ""
+              echo '```diff'
+              grep -E "^[+-][^+-]" /tmp/gas.diff | grep "gas:" | head -100 || true
+              echo '```'
+            fi
+            echo ""
+            echo "<sub>Reported by the Gas Diff workflow. This comment updates on every push.</sub>"
+            echo "EOF"
+          } > /tmp/gas-comment.md
+          wc -c /tmp/gas-comment.md
+
+      - name: Upsert PR comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require("fs");
+            const body = fs.readFileSync("/tmp/gas-comment.md", "utf8");
+            const marker = "<!-- gas-diff-report -->";
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            const existing = comments.find((c) => c.body.includes(marker));
+            const payload = marker + "\n" + body;
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body: payload,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: payload,
+              });
+            }
+            

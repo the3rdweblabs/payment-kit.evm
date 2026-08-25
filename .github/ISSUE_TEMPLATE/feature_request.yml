@@ -1,0 +1,53 @@
+name: Feature request
+description: Suggest an idea or improvement for payment-kit.evm
+labels: ["enhancement", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Check existing issues first so we don't duplicate work. If this is a
+        security concern, follow [SECURITY.md](../SECURITY.md) instead.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem to solve
+      description: What are you trying to do that the kit currently can't (or makes hard)?
+      placeholder: As an integrator on Base, I want ... because ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: What should happen? Sketch API shape if relevant (function signatures welcome).
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Other approaches, including "do nothing" and why they fall short.
+
+  - type: checkboxes
+    id: sui-parity
+    attributes:
+      label: Relation to the Sui original
+      description: Does this exist in MystenLabs/sui-payment-kit?
+      options:
+        - label: This exists in sui-payment-kit (parity feature)
+        - label: This is EVM-specific (no Sui equivalent)
+
+  - type: dropdown
+    id: willingness
+    attributes:
+      label: Would you like to implement this?
+      options:
+        - "Yes, I'd like to open a PR"
+        - "Yes, with guidance from maintainers"
+        - "No, just suggesting"
+    validations:
+      required: true
+      

@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security vulnerability
+    url: mailto:the3rdweblabs@gmail.com
+    about: >-
+      Report exploitable issues privately (GitHub Security Advisory preferred).
+      Never open a public issue for security reports.
+  - name: Questions / support
+    url: https://github.com/the3rdweblabs/payment-kit.evm/discussions
+    about: Usage questions and integration help - please don't open issues for these.
+    
