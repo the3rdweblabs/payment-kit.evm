@@ -65,7 +65,7 @@ jobs:
           wc -c /tmp/gas-comment.md
 
       - name: Upsert PR comment
-        uses: actions/github-script@v7
+        uses: actions/github-script@v9
         with:
           script: |
             const fs = require("fs");
