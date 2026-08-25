@@ -1,0 +1,72 @@
+name: Bug report
+description: Report something broken or behaving incorrectly
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug!
+
+        **Security vulnerabilities must NOT be reported here.**
+        Please follow [SECURITY.md](../SECURITY.md) instead.
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: A clear description of the bug, including what you expected to happen.
+    validations:
+      required: true
+
+  - type: textarea
+    id: repro
+    attributes:
+      label: Reproduction steps
+      description: Minimal steps, code snippet, or Foundry test that reproduces it.
+      placeholder: |
+        1. Deploy factory with `make deploy-factory-monad-testnet`
+        2. Call `registry.pay(...)` with ...
+        3. See error `...`
+    validations:
+      required: true
+
+  - type: dropdown
+    id: component
+    attributes:
+      label: Affected component
+      options:
+        - PaymentRegistry
+        - PaymentRegistryFactory
+        - IPaymentRegistry / PaymentTypes
+        - Deploy scripts (DeployForwarder/Factory/Registry)
+        - Documentation
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: commit
+    attributes:
+      label: Commit / version
+      description: The git commit you observed the behavior on.
+      placeholder: e.g. main@a1b2c3d
+    validations:
+      required: true
+
+  - type: input
+    id: foundry-version
+    attributes:
+      label: Foundry version
+      description: Output of `forge --version`
+    validations:
+      required: false
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant output
+      description: Forge trace excerpts, revert data, tx hashes. Do NOT paste private keys.
+      render: shell
+    validations:
+      required: false
+      
