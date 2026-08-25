@@ -1,0 +1,11 @@
+{
+  "block": 56732266,
+  "chainId": 10143,
+  "deployer": "0xC396caB081dAb1E2d1561Af4f33B25d035C0FD29",
+  "factory": "0x5dE60c9D93b3b9031dd04647cBb92b92209B1884",
+  "forwarder": "0x51fd8A7D8d517fa1218D46a5Ae17BAC668544Ede",
+  "implementation": "0x972123b75351581ebba0aE4B7A10fc54495358A1",
+  "network": "monad-testnet",
+  "registry": "0x0000000000000000000000000000000000000000",
+  "timestamp": 1787643774
+}
